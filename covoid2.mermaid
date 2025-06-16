@@ -1,0 +1,199 @@
+classDiagram
+    class User {
+        -id: UUID
+        -lastName: String
+        -firstName: String
+        -email: String
+        -phone: String
+        -birthDate: Date
+        -photo: String
+        -registrationDate: Date
+        -globalRating: Double
+        -numberOfTrips: Integer
+        -isVerified: Boolean
+        +createProfile()
+        +updateProfile()
+        +addPhoto()
+        +verifyIdentity()
+    }
+
+    class Driver {
+        -drivingLicense: String
+        -licenseObtentionDate: Date
+        -drivingExperience: Integer
+        +addVehicle()
+        +createTrip()
+        +acceptPassenger()
+        +cancelTrip()
+    }
+
+    class Passenger {
+        +searchTrip()
+        +bookSeat()
+        +cancelBooking()
+        +contactDriver()
+    }
+
+    class Vehicle {
+        -id: UUID
+        -brand: String
+        -model: String
+        -color: String
+        -licensePlate: String
+        -year: Integer
+        -numberOfSeats: Integer
+        -fuelType: String
+        -hasAirConditioning: Boolean
+        -isVerified: Boolean
+        +addPhoto()
+        +update()
+    }
+
+    class Trip {
+        -id: UUID
+        -departureCity: String
+        -departureCoordinates: String
+        -arrivalCity: String
+        -arrivalCoordinates: String
+        -departureDate: DateTime
+        -departureTime: Time
+        -estimatedDuration: Integer
+        -distanceKm: Double
+        -pricePerSeat: Double
+        -availableSeats: Integer
+        -totalSeats: Integer
+        -status: TripStatus
+        -comments: String
+        -petsAllowed: Boolean
+        -luggageAllowed: Boolean
+        -possibleStops: List<String>
+        +publish()
+        +update()
+        +cancel()
+        +addStop()
+    }
+
+    class Booking {
+        -id: UUID
+        -bookingDate: DateTime
+        -numberOfSeats: Integer
+        -totalAmount: Double
+        -status: BookingStatus
+        -passengerComment: String
+        +confirm()
+        +cancel()
+        +pay()
+    }
+
+    class Payment {
+        -id: UUID
+        -amount: Double
+        -paymentDate: DateTime
+        -paymentMethod: String
+        -status: PaymentStatus
+        -serviceFee: Double
+        +process()
+        +refund()
+    }
+
+    class Review {
+        -id: UUID
+        -rating: Integer
+        -comment: String
+        -reviewDate: DateTime
+        -type: ReviewType
+        +publish()
+        +update()
+        +report()
+    }
+
+    class Message {
+        -id: UUID
+        -content: String
+        -sendDate: DateTime
+        -isRead: Boolean
+        +send()
+        +markAsRead()
+    }
+
+    class Notification {
+        -id: UUID
+        -title: String
+        -message: String
+        -creationDate: DateTime
+        -isRead: Boolean
+        -type: NotificationType
+        +send()
+        +markAsRead()
+    }
+
+    %% Enumerations
+    class TripStatus {
+        <<enumeration>>
+        DRAFT
+        PUBLISHED
+        FULL
+        IN_PROGRESS
+        COMPLETED
+        CANCELLED
+    }
+
+    class BookingStatus {
+        <<enumeration>>
+        PENDING
+        CONFIRMED
+        PAID
+        CANCELLED
+        COMPLETED
+    }
+
+    class PaymentStatus {
+        <<enumeration>>
+        PENDING
+        CONFIRMED
+        FAILED
+        REFUNDED
+    }
+
+    class ReviewType {
+        <<enumeration>>
+        DRIVER_TO_PASSENGER
+        PASSENGER_TO_DRIVER
+    }
+
+    class NotificationType {
+        <<enumeration>>
+        BOOKING
+        PAYMENT
+        CANCELLATION
+        REMINDER
+        MESSAGE
+    }
+
+    %% Inheritance relationships
+    User <|-- Driver
+    User <|-- Passenger
+
+    %% Associations with cardinalities and roles
+    Driver "1" o-- "1..*" Vehicle : owns
+    Driver "1" -- "0..*" Trip : offers
+
+    Trip "0..*" -- "1" Vehicle : uses
+    Trip "1" *-- "0..*" Booking
+
+    Passenger "1" -- "0..*" Booking : makes
+    Booking "1" -- "1" Payment
+
+    %% Bidirectional association for messages
+    Message "*" -- "*" User
+
+    %% Association for notifications
+    Notification "0..*" --> "1" User
+
+    %% Associations for reviews
+    Review "0..*" --> "1" User : author
+    Review "0..*" --> "1" User : recipient
+    Review "0..*" --> "1" Trip
+
+    %% Association for bookings and trips
+    Trip "*" -- "*" Passenger

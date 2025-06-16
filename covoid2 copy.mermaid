@@ -1,0 +1,197 @@
+classDiagram
+    class Utilisateur {
+        -id: String
+        -nom: String
+        -prenom: String
+        -email: String
+        -telephone: String
+        -dateNaissance: Date
+        -photo: String
+        -dateInscription: Date
+        -noteGlobale: Float
+        -nbVoyages: Integer
+        -estVerifie: Boolean
+        +creerProfil()
+        +modifierProfil()
+        +ajouterPhoto()
+        +verifierIdentite()
+    }
+
+    class Conducteur {
+        -permisConduire: String
+        -dateObtentionPermis: Date
+        -experienceConduite: Integer
+        +ajouterVehicule()
+        +creerTrajet()
+        +accepterPassager()
+        +annulerTrajet()
+    }
+
+    class Passager {
+        +rechercherTrajet()
+        +reserverPlace()
+        +annulerReservation()
+        +contacterConducteur()
+    }
+
+    class Vehicule {
+        -id: String
+        -marque: String
+        -modele: String
+        -couleur: String
+        -immatriculation: String
+        -annee: Integer
+        -nbPlaces: Integer
+        -typeCarburant: String
+        -climatisation: Boolean
+        -estVerifie: Boolean
+        +ajouterPhoto()
+        +modifier()
+    }
+
+    class Trajet {
+        -id: String
+        -villeDepart: String
+        -villeArrivee: String
+        -dateDepart: DateTime
+        -heureDepart: Time
+        -dureeEstimee: Integer
+        -distanceKm: Integer
+        -prixParPlace: Float
+        -nbPlacesDisponibles: Integer
+        -nbPlacesTotal: Integer
+        -statut: StatutTrajet
+        -commentaires: String
+        -accepteAnimaux: Boolean
+        -accepteBagages: Boolean
+        -arretsPossibles: List<String>
+        +publier()
+        +modifier()
+        +annuler()
+        +ajouterArret()
+    }
+
+    class Reservation {
+        -id: String
+        -dateReservation: DateTime
+        -nbPlaces: Integer
+        -montantTotal: Float
+        -statut: StatutReservation
+        -commentairePassager: String
+        +confirmer()
+        +annuler()
+        +payer()
+    }
+
+    class Paiement {
+        -id: String
+        -montant: Float
+        -datePaiement: DateTime
+        -methodePaiement: String
+        -statut: StatutPaiement
+        -fraisService: Float
+        +traiter()
+        +rembourser()
+    }
+
+    class Avis {
+        -id: String
+        -note: Integer
+        -commentaire: String
+        -dateAvis: DateTime
+        -type: TypeAvis
+        +publier()
+        +modifier()
+        +signaler()
+    }
+
+    class Message {
+        -id: String
+        -contenu: String
+        -dateEnvoi: DateTime
+        -estLu: Boolean
+        +envoyer()
+        +marquerCommeLu()
+    }
+
+    class Notification {
+        -id: String
+        -titre: String
+        -message: String
+        -dateCreation: DateTime
+        -estLue: Boolean
+        -type: TypeNotification
+        +envoyer()
+        +marquerCommeLue()
+    }
+
+    %% Énumérations
+    class StatutTrajet {
+        <<enumeration>>
+        BROUILLON
+        PUBLIE
+        COMPLET
+        EN_COURS
+        TERMINE
+        ANNULE
+    }
+
+    class StatutReservation {
+        <<enumeration>>
+        EN_ATTENTE
+        CONFIRMEE
+        PAYEE
+        ANNULEE
+        TERMINEE
+    }
+
+    class StatutPaiement {
+        <<enumeration>>
+        EN_ATTENTE
+        CONFIRME
+        ECHEC
+        REMBOURSE
+    }
+
+    class TypeAvis {
+        <<enumeration>>
+        CONDUCTEUR_VERS_PASSAGER
+        PASSAGER_VERS_CONDUCTEUR
+    }
+
+    class TypeNotification {
+        <<enumeration>>
+        RESERVATION
+        PAIEMENT
+        ANNULATION
+        RAPPEL
+        MESSAGE
+    }
+
+    %% Relations avec héritage
+    Utilisateur <|-- Conducteur
+    Utilisateur <|-- Passager
+
+    %% Associations avec cardinalités et rôles
+    Conducteur "1" o-- "1..*" Vehicule : possède
+    Conducteur "1" -- "0..*" Trajet : propose
+
+    Trajet "0..*" -- "1" Vehicule : utilise
+    Trajet "1" *-- "0..*" Reservation
+
+    Passager "1" -- "0..*" Reservation : fait
+    Reservation "1" -- "1" Paiement
+
+    %% Association bidirectionnelle pour les messages
+    Message "*" -- "*" Utilisateur
+
+    %% Association pour les notifications
+    Notification "0..*" --> "1" Utilisateur
+
+    %% Associations pour les avis
+    Avis "0..*" --> "1" Utilisateur : auteur
+    Avis "0..*" --> "1" Utilisateur : destinataire
+    Avis "0..*" --> "1" Trajet
+
+    %% Association pour les réservations et trajets
+    Trajet "*" -- "*" Passager

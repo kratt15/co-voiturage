@@ -1,0 +1,110 @@
+classDiagram
+    class Utilisateur {
+        -id: int
+        -nom: string
+        -prenom: string
+        -email: string
+        -telephone: string
+        -dateInscription: Date
+        -note: float
+        -estVerifie: boolean
+        +creerProfil()
+        +modifierProfil()
+        +consulterHistorique()
+    }
+
+    class Conducteur {
+        -numeroPermis: string
+        -dateObtentionPermis: Date
+        +proposerTrajet()
+        +annulerTrajet()
+        +accepterPassager()
+        +refuserPassager()
+    }
+
+    class Passager {
+        +rechercherTrajet()
+        +reserverPlace()
+        +annulerReservation()
+        +evaluerTrajet()
+    }
+
+    class Trajet {
+        -id: int
+        -villeDepart: string
+        -villeArrivee: string
+        -dateHeure: DateTime
+        -nombrePlacesDisponibles: int
+        -prixParPlace: float
+        -statut: string
+        -description: string
+        +publier()
+        +modifier()
+        +annuler()
+        +calculerDuree()
+    }
+
+    class Reservation {
+        -id: int
+        -dateReservation: DateTime
+        -nombrePlaces: int
+        -statut: string
+        -montantTotal: float
+        +confirmer()
+        +annuler()
+        +calculerMontant()
+    }
+
+    class Voiture {
+        -id: int
+        -marque: string
+        -modele: string
+        -couleur: string
+        -immatriculation: string
+        -nombrePlaces: int
+        -annee: int
+        +valider()
+        +modifier()
+    }
+
+    class Paiement {
+        -id: int
+        -montant: float
+        -datePaiement: DateTime
+        -methodePaiement: string
+        -statut: string
+        +traiter()
+        +rembourser()
+        +confirmer()
+    }
+
+    class Evaluation {
+        -id: int
+        -note: int
+        -commentaire: string
+        -dateEvaluation: DateTime
+        +publier()
+        +modifier()
+        +supprimer()
+    }
+
+    class Notification {
+        -id: int
+        -titre: string
+        -message: string
+        -dateEnvoi: DateTime
+        -estLue: boolean
+        +envoyer()
+        +marquerCommeRecue()
+    }
+
+    Utilisateur --> Conducteur
+    Utilisateur --> Passager
+    Conducteur --> Voiture
+    Conducteur --> Trajet
+    Passager --> Reservation
+    Trajet --> Reservation
+    Reservation --> Paiement
+    Utilisateur --> Evaluation
+    Trajet --> Evaluation
+    Utilisateur --> Notification
