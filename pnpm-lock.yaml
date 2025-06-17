@@ -20,6 +20,9 @@ importers:
       '@adonisjs/lucid':
         specifier: ^21.6.1
         version: 21.6.1(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@adonisjs/core@6.18.0(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1))(@vinejs/vine@3.0.1)(luxon@3.6.1)(pg@8.16.0)
+      '@holoyan/adonisjs-permissions':
+        specifier: ^1.1.0
+        version: 1.1.0(@adonisjs/core@6.18.0(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1))(@adonisjs/lucid@21.6.1(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@adonisjs/core@6.18.0(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1))(@vinejs/vine@3.0.1)(luxon@3.6.1)(pg@8.16.0))(@types/uuid@10.0.0)(luxon@3.6.1)(uuid@11.1.0)
       '@types/uuid':
         specifier: ^10.0.0
         version: 10.0.0
@@ -359,6 +362,16 @@ packages:
   '@faker-js/faker@9.8.0':
     resolution: {integrity: sha512-U9wpuSrJC93jZBxx/Qq2wPjCuYISBueyVUGK7qqdmj7r/nxaxwW8AQDCLeRO7wZnjj94sh3p246cAYjUKuqgfg==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0'}
+
+  '@holoyan/adonisjs-permissions@1.1.0':
+    resolution: {integrity: sha512-oafzZxE3uiWh+/wLJsWaeXTHejZdj/8QUMLGyLMwggYVOPL3N7vhpRvzygSmh2M04xDfeBGji06iDossg4VUzg==}
+    engines: {node: '>=18.16.0'}
+    peerDependencies:
+      '@adonisjs/core': ^6.2.0
+      '@adonisjs/lucid': ^21.0.0
+      '@types/uuid': ^10.0.0
+      luxon: ^3.4.4
+      uuid: ^10.0.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2825,6 +2838,14 @@ snapshots:
       levn: 0.4.1
 
   '@faker-js/faker@9.8.0': {}
+
+  '@holoyan/adonisjs-permissions@1.1.0(@adonisjs/core@6.18.0(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1))(@adonisjs/lucid@21.6.1(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@adonisjs/core@6.18.0(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1))(@vinejs/vine@3.0.1)(luxon@3.6.1)(pg@8.16.0))(@types/uuid@10.0.0)(luxon@3.6.1)(uuid@11.1.0)':
+    dependencies:
+      '@adonisjs/core': 6.18.0(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1)
+      '@adonisjs/lucid': 21.6.1(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@adonisjs/core@6.18.0(@adonisjs/assembler@7.8.2(typescript@5.8.3))(@vinejs/vine@3.0.1))(@vinejs/vine@3.0.1)(luxon@3.6.1)(pg@8.16.0)
+      '@types/uuid': 10.0.0
+      luxon: 3.6.1
+      uuid: 11.1.0
 
   '@humanfs/core@0.19.1': {}
 

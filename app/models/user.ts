@@ -6,6 +6,8 @@ import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { v4 as uuidv4 } from 'uuid'
+import { MorphMap } from '@holoyan/adonisjs-permissions'
+import { AclModelInterface } from '@holoyan/adonisjs-permissions/types'
 //
 import Vehicle from '#models/vehicle'
 import Trip from '#models/trip'
@@ -13,12 +15,18 @@ import Booking from '#models/booking'
 import Review from '#models/review'
 import Notification from '#models/notification'
 
+// import mixin
+import { hasPermissions } from '@holoyan/adonisjs-permissions'
+
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
   passwordColumnName: 'password',
 })
-
-export default class User extends compose(BaseModel, AuthFinder) {
+@MorphMap('users')
+export default class User extends compose(BaseModel, AuthFinder, hasPermissions()) implements AclModelInterface{
+  getModelId(): number {
+    return this.id
+  }
   @column({ isPrimary: true })
   declare id: number
 
