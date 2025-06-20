@@ -195,7 +195,7 @@ erDiagram
 
 ## 📁 Structure du Projet
 
-```
+```graph
 co-voiturage/
 ├── app/
 │   ├── models/           # Modèles Lucid (User, Trip, etc.)
@@ -331,7 +331,7 @@ Le projet suit le diagramme défini dans `covoid2.mermaid` :
 
 ### Architecture en Couches
 
-```
+```graph
 ┌─────────────────────────────────┐
 │          API Routes             │  ← Routes HTTP
 ├─────────────────────────────────┤
@@ -408,4 +408,4 @@ Le projet suit le diagramme défini dans `covoid2.mermaid` :
 
 ---
 
-_Dernière mise à jour : Janvier 2025_
+### Dernière mise à jour : Juin 2025

@@ -11,7 +11,7 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 //controllers
 const roleAndPermission = () => import('#controllers/roles_and_permissions_controller')
-
+const authController = () => import('#controllers/auth/auth_controller')
 
 router.get('/', async () => {
   return {
@@ -54,5 +54,24 @@ router.group(() => {
   }).prefix('/acl').use([middleware.auth()])
 
   // Auth routes
+  router.group(() => {
+    // register a user
+    router.post('/register', [authController,'register']).as('auth.register')
+    // login a user
+    router.post('/login', [authController,'login']).as('auth.login')
+    // logout a user
+    router.post('/logout', [authController,'logout']).as('auth.logout').use([middleware.auth()])
+    // get current user
+    router.get('/current-user', [authController,'currentUser']).as('auth.current.user').use([middleware.auth()])
+    // resend email
+    router.post('/resend-email', [authController,'resendEmail']).as('auth.resend.email')
+    // verify email
+    router.get('/verify-email', [authController,'verifyEmail']).as('auth.verify.email')
+    // forgot password
+    router.post('/forgot-password', [authController,'forgotPassword']).as('auth.forgot.password')
+    // reset password
+    router.post('/reset-password', [authController,'resetPassword']).as('auth.reset.password')
+
+  }).prefix('/auth')
 
 }).prefix('/api/v1')

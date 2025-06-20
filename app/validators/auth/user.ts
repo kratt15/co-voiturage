@@ -2,8 +2,8 @@ import vine from '@vinejs/vine'
 
 export const registerValidator = vine.compile(
     vine.object({
-        firstname: vine.string().trim().minLength(3).maxLength(255),
-        lastname: vine.string().trim().minLength(3).maxLength(255),
+        firstName: vine.string().trim().minLength(3).maxLength(255),
+        lastName: vine.string().trim().minLength(3).maxLength(255),
         email: vine.string().trim().email().unique(async(db,value) => {
           const user = await db.from('users').where('email', value).first()
           return !user
@@ -11,7 +11,7 @@ export const registerValidator = vine.compile(
 
         password: vine.string().minLength(8).maxLength(30).confirmed({confirmationField: 'passwordConfirmation'})
     })
-) 
+)
 
 export const loginValidator = vine.compile(
     vine.object({

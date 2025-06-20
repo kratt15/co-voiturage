@@ -23,7 +23,10 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   passwordColumnName: 'password',
 })
 @MorphMap('users')
-export default class User extends compose(BaseModel, AuthFinder, hasPermissions()) implements AclModelInterface{
+export default class User
+  extends compose(BaseModel, AuthFinder, hasPermissions())
+  implements AclModelInterface
+{
   getModelId(): number {
     return this.id
   }
@@ -62,6 +65,24 @@ export default class User extends compose(BaseModel, AuthFinder, hasPermissions(
 
   @column({ serializeAs: null })
   declare password: string
+
+  @column()
+  declare emailVerificationToken: string | null
+
+  @column.dateTime()
+  declare emailVerificationTokenExpiresAt: DateTime | null
+
+  @column()
+  declare emailVerified: boolean
+
+  @column()
+  declare isAdmin: boolean
+
+  @column()
+  declare isActive: boolean | null
+
+  @column()
+  declare logCount: number
 
   // Champs Driver (optionnels)
   @column()

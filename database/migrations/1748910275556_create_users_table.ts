@@ -17,6 +17,12 @@ export default class extends BaseSchema {
       table.integer('number_of_trips').defaultTo(0)
       table.boolean('is_verified').defaultTo(false)
       table.string('password').notNullable()
+      table.string('email_verification_token').nullable()
+      table.timestamp('email_verification_token_expires_at').nullable()
+      table.boolean('email_verified').defaultTo(false)
+      table.boolean('is_admin').defaultTo(false)
+      table.boolean('is_active').nullable()
+      table.integer('log_count').defaultTo(0)
 
       // Champs spécifiques aux conducteurs (optionnels)
       table.string('driving_license').nullable()
