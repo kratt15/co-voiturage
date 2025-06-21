@@ -74,4 +74,10 @@ router.group(() => {
 
   }).prefix('/auth')
 
+  // Vehicle routes
+  router.group(() => {
+    // get all vehicles
+    
+  }).prefix('/vehicle')
+
 }).prefix('/api/v1')

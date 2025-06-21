@@ -1,0 +1,36 @@
+### Variables d'environnement
+@baseUrl = http://localhost:3333/api/v1
+@email = test@example.com
+@password = password123
+### 3. Extraire le token de la réponse précédente
+@token = "1234567890"
+
+### 1. Inscription
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Test",
+  "lastName": "User",
+  "email": "{{email}}",
+  "phone": "+33123456789",
+  "birthDate": "1990-01-01",
+  "password": "{{password}}",
+  "passwordConfirmation": "{{password}}"
+}
+
+### 2. Connexion
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+
+
+### 4. Profil utilisateur
+GET {{baseUrl}}/auth/current-user
+Authorization: Bearer {{token}}

@@ -1,0 +1,52 @@
+### Variables d'environnement
+@baseUrl = http://localhost:3333/api/v1
+@token = "1234567890"
+
+### 1. Création d'un véhicule
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "brand": "Toyota",
+  "model": "Corolla",
+  "color": "Red",
+  "licensePlate": "ABC123",
+  "year": 2020,
+  "numberOfSeats": 5,
+  "fuelType": "Gasoline",
+  "hasAirConditioning": true,
+  "isVerified": true
+}
+
+### 2. Récupération de tous les véhicules
+GET {{baseUrl}}/vehicles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 3. Récupération d'un véhicule spécifique
+GET {{baseUrl}}/vehicles/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 4. Mise à jour d'un véhicule
+PUT {{baseUrl}}/vehicles/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "brand": "Tesla",
+  "model": "Model S",
+  "color": "Black",
+  "licensePlate": "ABC1234",
+  "year": 2025,
+  "numberOfSeats": 5,
+  "fuelType": "Electric",
+  "hasAirConditioning": true,
+  "isVerified": true
+}
+
+### 5. Suppression d'un véhicule
+DELETE {{baseUrl}}/vehicles/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
