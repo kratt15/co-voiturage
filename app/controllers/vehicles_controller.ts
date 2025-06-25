@@ -1,16 +1,23 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { createVehicleValidator, updateVehicleValidator } from '#validators/vehicle'
 import Vehicle from '#models/vehicle'
+import db from '@adonisjs/lucid/services/db'
 
 export default class VehiclesController {
-
   async createVehicle({ response, request, auth }: HttpContext) {
     try {
-      const vehicle = await request.validateUsing(createVehicleValidator)
-      const newVehicle = await Vehicle.create({
-        ...vehicle,
-        driverId: auth.user?.id,
+      const result = await db.transaction(async (trx) => {
+        const vehicle = await request.validateUsing(createVehicleValidator)
+        const newVehicle = await Vehicle.create(
+          {
+            ...vehicle,
+            driverId: auth.user?.id,
+          },
+          { client: trx }
+        )
+        return { newVehicle }
       })
+      const newVehicle = result.newVehicle
       return response.json(newVehicle)
     } catch (error) {
       return response.status(500).json({ message: 'Internal server error', error: error.message })
@@ -21,15 +28,20 @@ export default class VehiclesController {
     try {
       const { uuid } = request.params()
       const vehicle = await request.validateUsing(updateVehicleValidator)
-      const updatedVehicle = await Vehicle.findBy('uuid', uuid)
-      if (!updatedVehicle) {
+      const foundVehicle = await Vehicle.findBy('uuid', uuid)
+      if (!foundVehicle) {
         return response.status(404).json({ message: 'Vehicle not found' })
       }
-      updatedVehicle.merge({
-        ...vehicle,
-        driverId: auth.user?.id,
+
+      const result = await db.transaction(async (trx) => {
+        foundVehicle.merge({
+          ...vehicle,
+          driverId: auth.user?.id,
+        })
+        await foundVehicle.useTransaction(trx).save()
+        return { updatedVehicle: foundVehicle }
       })
-      await updatedVehicle.save()
+      const updatedVehicle = result.updatedVehicle
       return response.json(updatedVehicle)
     } catch (error) {
       return response.status(500).json({ message: 'Internal server error', error: error.message })
@@ -84,19 +96,19 @@ export default class VehiclesController {
       if (!vehicle) {
         return response.status(404).json({ message: 'Vehicle not found' })
       }
-          // Transformer les données pour masquer l'id du driver
-    const vehicleData = vehicle.toJSON()
-    if (vehicleData.driver) {
-      delete vehicleData.driver.id
-    }
-    if (vehicleData.id) {
-      delete vehicleData.id
-    }
-    if (vehicleData.driverId) {
-      delete vehicleData.driverId
-    }
+      // Transformer les données pour masquer l'id du driver
+      const vehicleData = vehicle.toJSON()
+      if (vehicleData.driver) {
+        delete vehicleData.driver.id
+      }
+      if (vehicleData.id) {
+        delete vehicleData.id
+      }
+      if (vehicleData.driverId) {
+        delete vehicleData.driverId
+      }
 
-    return response.json(vehicleData)
+      return response.json(vehicleData)
     } catch (error) {
       return response.status(500).json({ message: 'Internal server error', error: error })
     }
