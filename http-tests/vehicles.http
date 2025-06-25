@@ -1,6 +1,6 @@
 ### Variables d'environnement
 @baseUrl = http://localhost:3333/api/v1
-@token = "1234567890"
+@token = oat_MQ.ZV9OTmc3d2twSXItRGdlc3dfMkVGZjZEYU9yWkdYdmtOTmEzRGczeTM1NTgyMjY4OTM
 
 ### 1. Création d'un véhicule
 POST {{baseUrl}}/vehicles
@@ -25,12 +25,12 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### 3. Récupération d'un véhicule spécifique
-GET {{baseUrl}}/vehicles/1
+GET {{baseUrl}}/vehicles/9b9ed03c-17b3-4391-9c35-b334affcffd5
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 ### 4. Mise à jour d'un véhicule
-PUT {{baseUrl}}/vehicles/1
+PUT {{baseUrl}}/vehicles/9b9ed03c-17b3-4391-9c35-b334affcffd5
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -47,6 +47,6 @@ Authorization: Bearer {{token}}
 }
 
 ### 5. Suppression d'un véhicule
-DELETE {{baseUrl}}/vehicles/1
+DELETE {{baseUrl}}/vehicles/9b9ed03c-17b3-4391-9c35-b334affcffd5
 Content-Type: application/json
 Authorization: Bearer {{token}}

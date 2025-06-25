@@ -4,7 +4,7 @@ import User from '#models/user'
 import { MailService } from '#services/mail_service'
 import { inject } from '@adonisjs/core/container'
 import PrimaryException  from '#exceptions/primary_exception'
-
+import { DateTime } from 'luxon'
 @inject()
 export default class AuthController {
 
@@ -16,19 +16,24 @@ export default class AuthController {
 
       try{
 
-        const {firstName, lastName, email, password} = await request.validateUsing(registerValidator)
+        const {firstName, lastName, email, password, phone, birthDate, photo, globalRating, numberOfTrips} = await request.validateUsing(registerValidator)
 
         const user = await User.create({
             firstName,
             lastName,
             email,
+            phone,
+            birthDate:DateTime.fromJSDate(birthDate),
+            photo,
+            globalRating,
+            numberOfTrips,
             password,
             isAdmin: false,
             isActive: true,
 
         })
 
-     const mailResponse = await this.mailService.sendMail(user,'Verify your email', 'email-verification', 'emailVerification')
+     const mailResponse = await this.mailService.sendMail(user,'Verify your email', 'emails/email-verification', 'emailVerification')
 
         return response.status(201).json({
             message: 'User created successfully',
@@ -40,7 +45,7 @@ export default class AuthController {
         console.error('Error while creating user:', error)
         return response.status(400).json({
             message: 'User creation failed',
-            error
+            error: error.message
         })
       }
     }
@@ -60,7 +65,7 @@ export default class AuthController {
                 throw new PrimaryException('user is not active',{code:'USER_NOT_ACTIVE', status:400})
             }
             const token = await User.accessTokens.create(user)
-            return response.status(200).send({ user, token })
+            return response.status(200).send({ token })
         }catch(error){
         return response.status(400).json({
             message: 'Login failed',
@@ -101,14 +106,14 @@ export default class AuthController {
         if(!user){
           throw new PrimaryException('User not found',{code:'USER_NOT_FOUND', status:400})
         }
-        const mailResponse = await this.mailService.sendMail(user,'Verify your email', '/emails/email-verification', 'emailVerification')
+        const mailResponse = await this.mailService.sendMail(user,'Verify your email', 'emails/email-verification', 'emailVerification')
         return response.status(200).json({
           message: mailResponse.message
         })
       }catch(error){
         return response.status(400).json({
           message: 'Email sending failed',
-          error
+          error: error.message
         })
       }
     }
@@ -141,7 +146,7 @@ export default class AuthController {
           throw new PrimaryException('User not found',{code:'USER_NOT_FOUND', status:400})
         }
 
-        const mailResponse = await this.mailService.sendMail(user,'Reset your password', '/emails/forgot-password', 'passwordReset')
+        const mailResponse = await this.mailService.sendMail(user,'Reset your password', 'emails/forgot-password', 'passwordReset')
 
         return response.status(200).json({
           message: mailResponse.message

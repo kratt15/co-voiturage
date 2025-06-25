@@ -8,7 +8,14 @@ export const registerValidator = vine.compile(
           const user = await db.from('users').where('email', value).first()
           return !user
         }).toLowerCase(),
-
+        phone: vine.string().trim().minLength(10).maxLength(15).unique(async(db,value) => {
+          const user = await db.from('users').where('phone', value).first()
+          return !user
+        }),
+        birthDate: vine.date(),
+        photo: vine.string().trim().minLength(10).maxLength(255).optional(),
+        globalRating: vine.number().min(0).max(5).optional(),
+        numberOfTrips: vine.number().min(0).optional(),
         password: vine.string().minLength(8).maxLength(30).confirmed({confirmationField: 'passwordConfirmation'})
     })
 )

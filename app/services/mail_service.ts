@@ -8,7 +8,7 @@ import Env from '#start/env'
 export class MailService {
   // Your code here
 
-  async sendMail(user: User, subject: string, htmlView: string, type: string,text="") {
+  async sendMail(user: User, subject: string, htmlView: string, type: string, text = '') {
     try {
       const token = stringHelpers.generateRandom(64)
       let path = ''
@@ -23,12 +23,10 @@ export class MailService {
         await Token.create({
           token,
           email: user.email,
-          expiresAt: DateTime.now().plus({ minutes: 10 })
+          expiresAt: DateTime.now().plus({ minutes: 10 }),
         })
         path = 'reset-password/change-password'
       }
-
-
 
       const link = `${Env.get('URL_FRONT')}/${path}/${token}`
 
@@ -37,7 +35,7 @@ export class MailService {
           // .from(Env.get('MAIL_FROM'))
           .to(user.email)
           .subject(subject)
-          .htmlView(htmlView, { user, link ,text})
+          .htmlView(htmlView, { user, link, text })
       })
 
       return { message: 'Email sent successfully' }

@@ -3,7 +3,7 @@
 @email = test@example.com
 @password = password123
 ### 3. Extraire le token de la réponse précédente
-@token = "1234567890"
+@token = oat_MQ.ZV9OTmc3d2twSXItRGdlc3dfMkVGZjZEYU9yWkdYdmtOTmEzRGczeTM1NTgyMjY4OTM
 
 ### 1. Inscription
 POST {{baseUrl}}/auth/register
@@ -29,8 +29,33 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
+### 3. Réinitialisation de mot de passe
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
 
+{
+  "email": "{{email}}"
+}
 
-### 4. Profil utilisateur
+### 4. Réinitialisation de mot de passe
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+### 5. Profil utilisateur
 GET {{baseUrl}}/auth/current-user
 Authorization: Bearer {{token}}
+
+### 6. Déconnexion
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+
+### 7. Renvoyer un email de vérification
+POST {{baseUrl}}/auth/resend-email
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}

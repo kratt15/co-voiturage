@@ -12,72 +12,113 @@ import { middleware } from './kernel.js'
 //controllers
 const roleAndPermission = () => import('#controllers/roles_and_permissions_controller')
 const authController = () => import('#controllers/auth/auth_controller')
-
+const vehicleController = () => import('#controllers/vehicles_controller')
 router.get('/', async () => {
   return {
     hello: 'world',
   }
 })
 
+router
+  .group(() => {
+    // Roles and permissions routes
+    router
+      .group(() => {
+        // get all roles
+        router.get('/roles', [roleAndPermission, 'getRoles']).as('acl.roles')
+        // get all permissions
+        router.get('/permissions', [roleAndPermission, 'getPermission']).as('acl.permissions')
+        // get all roles for admin
+        router.get('/admin/roles', [roleAndPermission, 'allRoleUser']).as('acl.admin.roles')
+        // get all admins with their roles
+        router.get('/admins/roles', [roleAndPermission, 'allAdminWithRoles']).as('acl.admins.roles')
+        // get all permissions for role
+        router
+          .get('/role/:id/permissions', [roleAndPermission, 'getPermissionsForRole'])
+          .as('acl.role.permissions')
+        // get all roles with their permissions
+        router
+          .get('/roles/permissions', [roleAndPermission, 'getAllRolesWithPermissions'])
+          .as('acl.roles.permissions')
+        // get if a role is assigned to user
+        router
+          .get('/role/:id/users', [roleAndPermission, 'getRoleIslinkedWithUsers'])
+          .as('acl.role.users')
+        // create a role
+        router.post('/roles', [roleAndPermission, 'createRole']).as('acl.roles.create')
+        // create a permission
+        router
+          .post('/permissions', [roleAndPermission, 'createPermission'])
+          .as('acl.permissions.create')
+        // assign a role to  admins
+        router
+          .post('/admins/roles', [roleAndPermission, 'assignRolesToUser'])
+          .as('acl.admins.roles.create')
+        // revoke a role from admins
+        router
+          .delete('/admins/roles', [roleAndPermission, 'revokeRoleForUser'])
+          .as('acl.admins.roles.revoke')
+        // create a role with permissions
+        router
+          .post('/roles/permissions', [roleAndPermission, 'assignPermissions'])
+          .as('acl.roles.permissions.create')
+        // modify a role with her permissions
+        router
+          .put('/roles/:id/permissions', [roleAndPermission, 'modifyAssignPermissions'])
+          .as('acl.roles.permissions.modify')
+        // delete a role with her permissions
+        router
+          .delete('/roles/:id', [roleAndPermission, 'deleteAssignPermissions'])
+          .as('acl.roles.permissions.delete')
+      })
+      .prefix('/acl')
+      .use([middleware.auth()])
 
-router.group(() => {
-   // Roles and permissions routes
-   router.group(() => {
-    // get all roles
-    router.get('/roles', [roleAndPermission,'getRoles']).as('acl.roles')
-    // get all permissions
-    router.get('/permissions', [roleAndPermission,'getPermission']).as('acl.permissions')
-    // get all roles for admin
-    router.get('/admin/roles', [roleAndPermission,'allRoleUser']).as('acl.admin.roles')
-    // get all admins with their roles
-    router.get('/admins/roles', [roleAndPermission,'allAdminWithRoles']).as('acl.admins.roles')
-    // get all permissions for role
-    router.get('/role/:id/permissions', [roleAndPermission,'getPermissionsForRole']).as('acl.role.permissions')
-    // get all roles with their permissions
-    router.get('/roles/permissions', [roleAndPermission,'getAllRolesWithPermissions']).as('acl.roles.permissions')
-    // get if role is assigned to user
-    router.get('/role/:id/users', [roleAndPermission,'getRoleIslinkedWithUsers']).as('acl.role.users')
-    // create a role
-    router.post('/roles', [roleAndPermission,'createRole']).as('acl.roles.create')
-    // create a permission
-    router.post('/permissions', [roleAndPermission,'createPermission']).as('acl.permissions.create')
-    // assign a role to a admins
-    router.post('/admins/roles', [roleAndPermission,'assignRolesToUser']).as('acl.admins.roles.create')
-    // revoke a role from a admins
-    router.delete('/admins/roles', [roleAndPermission,'revokeRoleForUser']).as('acl.admins.roles.revoke')
-    // create a role with permissions
-    router.post('/roles/permissions', [roleAndPermission,'assignPermissions']).as('acl.roles.permissions.create')
-    // modify a role with her permissions
-    router.put('/roles/:id/permissions', [roleAndPermission,'modifyAssignPermissions']).as('acl.roles.permissions.modify')
-    // delete a role with her permissions
-    router.delete('/roles/:id', [roleAndPermission,'deleteAssignPermissions']).as('acl.roles.permissions.delete')
-  }).prefix('/acl').use([middleware.auth()])
+    // Auth routes
+    router
+      .group(() => {
+        // register a user
+        router.post('/register', [authController, 'register']).as('auth.register')
+        // login a user
+        router.post('/login', [authController, 'login']).as('auth.login')
+        // logout a user
+        router
+          .post('/logout', [authController, 'logout'])
+          .as('auth.logout')
+          .use([middleware.auth()])
+        // get current user
+        router
+          .get('/current-user', [authController, 'currentUser'])
+          .as('auth.current.user')
+          .use([middleware.auth()])
+        // resend email
+        router.post('/resend-email', [authController, 'resendEmail']).as('auth.resend.email')
+        // verify email
+        router.get('/verify-email', [authController, 'verifyEmail']).as('auth.verify.email')
+        // forgot password
+        router
+          .post('/forgot-password', [authController, 'forgotPassword'])
+          .as('auth.forgot.password')
+        // reset password
+        router.post('/reset-password', [authController, 'resetPassword']).as('auth.reset.password')
+      })
+      .prefix('/auth')
 
-  // Auth routes
-  router.group(() => {
-    // register a user
-    router.post('/register', [authController,'register']).as('auth.register')
-    // login a user
-    router.post('/login', [authController,'login']).as('auth.login')
-    // logout a user
-    router.post('/logout', [authController,'logout']).as('auth.logout').use([middleware.auth()])
-    // get current user
-    router.get('/current-user', [authController,'currentUser']).as('auth.current.user').use([middleware.auth()])
-    // resend email
-    router.post('/resend-email', [authController,'resendEmail']).as('auth.resend.email')
-    // verify email
-    router.get('/verify-email', [authController,'verifyEmail']).as('auth.verify.email')
-    // forgot password
-    router.post('/forgot-password', [authController,'forgotPassword']).as('auth.forgot.password')
-    // reset password
-    router.post('/reset-password', [authController,'resetPassword']).as('auth.reset.password')
-
-  }).prefix('/auth')
-
-  // Vehicle routes
-  router.group(() => {
-    // get all vehicles
-    
-  }).prefix('/vehicle')
-
-}).prefix('/api/v1')
+    // Vehicle routes
+    router
+      .group(() => {
+        // get all vehicles
+        router.get('/', [vehicleController, 'getAllVehicles']).as('vehicle.all')
+        // get a vehicle
+        router.get('/:uuid', [vehicleController, 'showVehicle']).as('vehicle.show')
+        // create a vehicle
+        router.post('/', [vehicleController, 'createVehicle']).as('vehicle.create')
+        // update a vehicle
+        router.put('/:uuid', [vehicleController, 'updateVehicle']).as('vehicle.update')
+        // delete a vehicle
+        router.delete('/:uuid', [vehicleController, 'deleteVehicle']).as('vehicle.delete')
+      })
+      .prefix('/vehicles')
+      .use([middleware.auth()])
+  })
+  .prefix('/api/v1')
