@@ -1,0 +1,52 @@
+### Variables d'environnement
+@baseUrl = http://localhost:3333/api/v1
+@email = test@example.com
+@password = password123
+### 3. Extraire le token de la réponse précédente
+@token = oat_Mg.WjVHOFRQQUt2R2xIZjVDUHJ1MkwxUFJabndwc0xsbTN1aTFGRmpEZTIzOTExMjQxNjg
+
+### 1. Get all trips
+GET {{baseUrl}}/trips
+Authorization: Bearer {{token}}
+
+### 2. Get a trip
+GET {{baseUrl}}/trips/1
+Authorization: Bearer {{token}}
+
+### 3. Create a trip
+POST {{baseUrl}}/trips
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "departureCoordinates": {
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  "arrivalCoordinates": {
+    "latitude": 50.6333,
+    "longitude": 3.0667
+  }
+}
+
+### 4. Create a trip with optimization
+POST {{baseUrl}}/trips/optimization
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "departureCoordinates": {
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  "arrivalCoordinates": {
+    "latitude": 50.6333,
+    "longitude": 3.0667
+  },
+  "waypoints": [
+    {
+      "latitude": 44.8738,
+      "longitude": 2.3480
+    }
+  ]
+}

@@ -38,4 +38,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_PORT: Env.schema.number(),
   SMTP_USERNAME: Env.schema.string(),
   SMTP_PASSWORD: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the route service
+  |----------------------------------------------------------
+  */
+  ROUTE_SERVICE_URL: Env.schema.string(),
+  ROUTE_SERVICE_API_KEY: Env.schema.string(),
 })

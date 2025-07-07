@@ -3,7 +3,7 @@
 @email = test@example.com
 @password = password123
 ### 3. Extraire le token de la réponse précédente
-@token = oat_MQ.ZV9OTmc3d2twSXItRGdlc3dfMkVGZjZEYU9yWkdYdmtOTmEzRGczeTM1NTgyMjY4OTM
+@token = oat_Mg.WjVHOFRQQUt2R2xIZjVDUHJ1MkwxUFJabndwc0xsbTN1aTFGRmpEZTIzOTExMjQxNjg
 
 ### 1. Inscription
 POST {{baseUrl}}/auth/register

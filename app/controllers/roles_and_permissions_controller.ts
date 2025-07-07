@@ -6,9 +6,11 @@ import {
   userAndRolesValidator,
 } from '#validators/role_and_permission'
 import { AclService } from '#services/acl_service'
+import { inject } from '@adonisjs/core/container'
 
+@inject()
 export default class RolesAndPermissionsController {
-  private aclService = new AclService()
+  constructor(private aclService: AclService) {}
 
   // Get all roles
   async getRoles({ response }: HttpContext) {

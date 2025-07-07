@@ -1,0 +1,29 @@
+### Test du service de routes
+POST http://localhost:3333/api/trips
+Content-Type: application/json
+
+{
+  "departureCoordinates": {
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  "arrivalCoordinates": {
+    "latitude": 50.6333,
+    "longitude": 3.0667
+  }
+}
+
+### Test avec des coordonnées de Paris à Lyon
+POST http://localhost:3333/api/trips
+Content-Type: application/json
+
+{
+  "departureCoordinates": {
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  "arrivalCoordinates": {
+    "latitude": 45.7640,
+    "longitude": 4.8357
+  }
+}

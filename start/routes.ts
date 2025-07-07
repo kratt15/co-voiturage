@@ -13,6 +13,8 @@ import { middleware } from './kernel.js'
 const roleAndPermission = () => import('#controllers/roles_and_permissions_controller')
 const authController = () => import('#controllers/auth/auth_controller')
 const vehicleController = () => import('#controllers/vehicles_controller')
+const userController = () => import('#controllers/users_controller')
+const tripController = () => import('#controllers/trips_controller')
 router.get('/', async () => {
   return {
     hello: 'world',
@@ -104,6 +106,26 @@ router
       })
       .prefix('/auth')
 
+
+    // User routes
+    router
+      .group(() => {
+        // get a user
+        router.get('/:uuid', [userController, 'getUser']).as('user.show')
+        // get user profile
+        router.get('/profile', [userController, 'profile']).as('user.profile')
+        // update user profile
+        router.put('/profile', [userController, 'updateProfile']).as('user.update.profile')
+        // update user password
+        router.put('/password', [userController, 'updatePassword']).as('user.update.password')
+        // delete user account
+        router.delete('/', [userController, 'deleteAccount']).as('user.delete')
+        // get user trips
+        router.get('/trips', [userController, 'userTrips']).as('user.trips')
+      })
+      .prefix('/users')
+      .use([middleware.auth()])
+
     // Vehicle routes
     router
       .group(() => {
@@ -119,6 +141,21 @@ router
         router.delete('/:uuid', [vehicleController, 'deleteVehicle']).as('vehicle.delete')
       })
       .prefix('/vehicles')
+      .use([middleware.auth()])
+
+    // Trip routes
+    router
+      .group(() => {
+        // get all trips
+        router.get('/', [tripController, 'getAllTrips']).as('trip.all')
+        // get a trip
+        router.get('/:uuid', [tripController, 'showTrip']).as('trip.show')
+        // create a trip
+        router.post('/', [tripController, 'createTrip']).as('trip.create')
+        // create a trip with optimization
+        router.post('/optimization', [tripController, 'createTripWithOptimization']).as('trip.create.optimization')
+      })
+      .prefix('/trips')
       .use([middleware.auth()])
   })
   .prefix('/api/v1')
