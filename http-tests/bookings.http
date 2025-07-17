@@ -1,0 +1,89 @@
+### API de Réservations avec Optimisation
+@host  = http://localhost:3333/api/v1
+@token = oat_Mg.WjVHOFRQQUt2R2xIZjVDUHJ1MkwxUFJabndwc0xsbTN1aTFGRmpEZTIzOTExMjQxNjg
+
+### 1. Créer une réservation
+POST {{host}}/bookings/trips/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "tripId": 1,
+  "numberOfSeats": 2,
+  "passengerComment": "Je serai à la gare principale"
+}
+
+### 2. Obtenir mes réservations
+GET {{host}}/bookings
+Authorization: Bearer {{token}}
+
+### 3. Obtenir une réservation spécifique
+GET {{host}}/bookings/YOUR_BOOKING_UUID
+Authorization: Bearer {{token}}
+
+### 4. Mettre à jour une réservation
+PUT {{host}}/bookings/YOUR_BOOKING_UUID
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "numberOfSeats": 3,
+  "passengerComment": "Finalement nous serons 3"
+}
+
+### 5. Annuler une réservation
+DELETE {{host}}/bookings/YOUR_BOOKING_UUID
+Authorization: Bearer {{token}}
+
+### --- Routes Conducteur ---
+
+### 6. Obtenir toutes les réservations pour un trajet (conducteur)
+GET {{host}}/bookings/trips/YOUR_TRIP_UUID/bookings
+Authorization: Bearer {{token}}
+
+### 7. Confirmer une réservation (conducteur)
+PUT {{host}}/bookings/YOUR_BOOKING_UUID/confirm
+Authorization: Bearer {{token}}
+
+### 8. Rejeter une réservation (conducteur)
+PUT {{host}}/bookings/YOUR_BOOKING_UUID/reject
+Authorization: Bearer {{token}}
+
+### --- Test d'optimisation ---
+
+### 9. Créer un trajet et l'optimiser
+POST {{host}}/trips/optimization
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "vehicleId": 1,
+  "departureCoordinates": {
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  "departureCity": "Paris",
+  "arrivalCity": "Lyon",
+  "arrivalCoordinates": {
+    "latitude": 45.7640,
+    "longitude": 4.8357
+  },
+  "departureDate": "2024-02-15",
+  "departureTime": "08:00",
+  "estimatedDuration": 240,
+  "distanceKm": 465,
+  "pricePerSeat": 30,
+  "availableSeats": 3,
+  "totalSeats": 4,
+  "status": "PUBLISHED",
+  "comments": "Trajet avec arrêts optimisés",
+  "petsAllowed": false,
+  "luggageAllowed": true,
+  "possibleStops": ["Melun", "Auxerre", "Mâcon"],
+  "driverId": 1
+}
+
+### 10. Déclencher l'optimisation d'un trajet existant
+# Utile après l'ajout de nouvelles réservations
+POST {{host}}/trips/YOUR_TRIP_ID/optimize
+Authorization: Bearer {{token}}

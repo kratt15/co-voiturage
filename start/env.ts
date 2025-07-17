@@ -46,4 +46,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   */
   ROUTE_SERVICE_URL: Env.schema.string(),
   ROUTE_SERVICE_API_KEY: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the mapbox package
+  |----------------------------------------------------------
+  */
+  MAPBOX_BASE_URL: Env.schema.string(),
+  MAPBOX_ACCESS_TOKEN: Env.schema.string(),
 })

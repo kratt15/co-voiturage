@@ -50,3 +50,22 @@ Content-Type: application/json
     }
   ]
 }
+
+### 5. Test geocoding
+POST {{baseUrl}}/trips/test-geocoding
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "address": " avepozo,Lomé,Togo"
+}
+
+### 6. Test reverse geocoding
+POST {{baseUrl}}/trips/test-reverse-geocoding
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "latitude": 6.172674,
+    "longitude": 1.349101
+}

@@ -15,6 +15,7 @@ const authController = () => import('#controllers/auth/auth_controller')
 const vehicleController = () => import('#controllers/vehicles_controller')
 const userController = () => import('#controllers/users_controller')
 const tripController = () => import('#controllers/trips_controller')
+const bookingController = () => import('#controllers/bookings_controller')
 router.get('/', async () => {
   return {
     hello: 'world',
@@ -106,7 +107,6 @@ router
       })
       .prefix('/auth')
 
-
     // User routes
     router
       .group(() => {
@@ -153,9 +153,48 @@ router
         // create a trip
         router.post('/', [tripController, 'createTrip']).as('trip.create')
         // create a trip with optimization
-        router.post('/optimization', [tripController, 'createTripWithOptimization']).as('trip.create.optimization')
+        router
+          .post('/optimization', [tripController, 'createTripWithOptimization'])
+          .as('trip.create.optimization')
+        // optimize an existing trip
+        router.post('/:id/optimize', [tripController, 'optimizeTrip']).as('trip.optimize')
+        // get optimized route for a trip
+        router
+          .get('/:uuid/optimized-route', [tripController, 'getOptimizedRoute'])
+          .as('trip.optimized.route')
+        // test geocoding
+        router.post('/test-geocoding', [tripController, 'testGeocoding']).as('trip.test.geocoding')
+        // test reverse geocoding
+        router.post('/test-reverse-geocoding', [tripController, 'testReverseGeocoding']).as('trip.test.reverse.geocoding')
       })
       .prefix('/trips')
+      .use([middleware.auth()])
+
+    // Booking routes
+    router
+      .group(() => {
+        // get all bookings for the current user
+        router.get('/', [bookingController, 'getMyBookings']).as('booking.my')
+        // get a specific booking
+        router.get('/:uuid', [bookingController, 'getBooking']).as('booking.show')
+        // create a booking for a trip
+        router.post('/trips/:tripId', [bookingController, 'createBooking']).as('booking.create')
+        // update a booking
+        router.put('/:uuid', [bookingController, 'updateBooking']).as('booking.update')
+        // cancel a booking
+        router.delete('/:uuid', [bookingController, 'cancelBooking']).as('booking.cancel')
+
+        // conducteur specific routes
+        // get all bookings for a trip (driver only)
+        router
+          .get('/trips/:uuid/bookings', [bookingController, 'getTripBookings'])
+          .as('booking.trip')
+        // confirm a booking (driver only)
+        router.put('/:uuid/confirm', [bookingController, 'confirmBooking']).as('booking.confirm')
+        // reject a booking (driver only)
+        router.put('/:uuid/reject', [bookingController, 'rejectBooking']).as('booking.reject')
+      })
+      .prefix('/bookings')
       .use([middleware.auth()])
   })
   .prefix('/api/v1')
