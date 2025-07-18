@@ -3,12 +3,12 @@
 @token = oat_Mg.WjVHOFRQQUt2R2xIZjVDUHJ1MkwxUFJabndwc0xsbTN1aTFGRmpEZTIzOTExMjQxNjg
 
 ### 1. Créer une réservation
-POST {{host}}/bookings/trips/1
+POST {{host}}/bookings/trips/ce89a959-9a69-496b-8ddc-0dd52894b497
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "tripId": 1,
+
   "numberOfSeats": 2,
   "passengerComment": "Je serai à la gare principale"
 }

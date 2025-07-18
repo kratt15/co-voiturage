@@ -203,7 +203,7 @@ router
         // get a specific booking
         router.get('/:uuid', [bookingController, 'getBooking']).as('booking.show')
         // create a booking for a trip
-        router.post('/trips/:tripId', [bookingController, 'createBooking']).as('booking.create')
+        router.post('/trips/:tripUuid', [bookingController, 'createBooking']).as('booking.create')
         // update a booking
         router.put('/:uuid', [bookingController, 'updateBooking']).as('booking.update')
         // cancel a booking

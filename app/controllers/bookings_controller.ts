@@ -5,11 +5,10 @@ import { inject } from "@adonisjs/core";
 import { MapboxRouteOptimizationService } from "#services/mapbox_route_optimization_service";
 import vine from "@vinejs/vine";
 import { DateTime } from "luxon";
-
+import { BookingStatus } from "#models/booking";
 // Validateurs pour les réservations
 const createBookingValidator = vine.compile(
   vine.object({
-    tripId: vine.number(),
     numberOfSeats: vine.number().min(1).max(8),
     passengerComment: vine.string().optional(),
   }),
@@ -32,11 +31,12 @@ export default class BookingsController {
   async createBooking({ request, response, auth }: HttpContext) {
     try {
       const user = auth.getUserOrFail();
+      const { tripUuid } = request.params();
       const data = await request.validateUsing(createBookingValidator);
 
       // Vérifier que le trajet existe et est disponible
       const trip = await Trip.query()
-        .where("id", data.tripId)
+        .where("uuid", tripUuid)
         .where("status", "PUBLISHED")
         .firstOrFail();
 
@@ -49,7 +49,7 @@ export default class BookingsController {
 
       // Vérifier que l'utilisateur n'a pas déjà réservé ce trajet
       const existingBooking = await Booking.query()
-        .where("tripId", data.tripId)
+        .where("tripId", trip.id)
         .where("passengerId", user.id)
         .whereNotIn("status", ["CANCELLED"])
         .first();
@@ -62,11 +62,11 @@ export default class BookingsController {
 
       // Créer la réservation
       const booking = await Booking.create({
-        tripId: data.tripId,
+        tripId: trip.id,
         passengerId: user.id,
         numberOfSeats: data.numberOfSeats,
         totalAmount: trip.pricePerSeat * data.numberOfSeats,
-        status: "CONFIRMED",
+        status: "PENDING" as BookingStatus,
         passengerComment: data.passengerComment,
         bookingDate: DateTime.now(),
       });
