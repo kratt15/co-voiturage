@@ -23,22 +23,30 @@ export const createTripValidator = vine.compile(
     pricePerSeat: vine.number().min(1),
     availableSeats: vine.number().min(1).max(100),
     totalSeats: vine.number().min(1).max(100),
-    status: vine.enum(['DRAFT', 'PUBLISHED', 'FULL', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
     comments: vine.string().trim().minLength(3).maxLength(255).optional(),
     petsAllowed: vine.boolean(),
     luggageAllowed: vine.boolean(),
-    possibleStops: vine.array(vine.string().trim().minLength(3).maxLength(255)).optional(),
+    possibleStops: vine.object({
+      stop_1: vine.string().trim().minLength(3).maxLength(255),
+      stop_2: vine.string().trim().minLength(3).maxLength(255),
+    }).optional(),
     vehicleId: vine.number().min(1),
-    driverId: vine.number().min(1),
+
   })
 )
 
 export const updateTripValidator = vine.compile(
   vine.object({
-    departureCoordinates: vine.string().trim().minLength(3).maxLength(255).optional(),
+    departureCoordinates: vine.object({
+      latitude: vine.number().min(-90).max(90),
+      longitude: vine.number().min(-180).max(180),
+    }).optional(),
     departureCity: vine.string().trim().minLength(3).maxLength(255).optional(),
     arrivalCity: vine.string().trim().minLength(3).maxLength(255).optional(),
-    arrivalCoordinates: vine.string().trim().minLength(3).maxLength(255).optional(),
+    arrivalCoordinates: vine.object({
+      latitude: vine.number().min(-90).max(90),
+      longitude: vine.number().min(-180).max(180),
+    }).optional(),
     departureDate: vine.date().optional(),
     departureTime: vine
       .string()
@@ -51,14 +59,14 @@ export const updateTripValidator = vine.compile(
     pricePerSeat: vine.number().min(1).optional(),
     availableSeats: vine.number().min(1).max(100).optional(),
     totalSeats: vine.number().min(1).max(100).optional(),
-    status: vine
-      .enum(['DRAFT', 'PUBLISHED', 'FULL', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'])
-      .optional(),
     comments: vine.string().trim().minLength(3).maxLength(255).optional(),
     petsAllowed: vine.boolean().optional(),
     luggageAllowed: vine.boolean().optional(),
-    possibleStops: vine.array(vine.string().trim().minLength(3).maxLength(255)).optional(),
+    possibleStops: vine.object({
+      stop_1: vine.string().trim().minLength(3).maxLength(255),
+      stop_2: vine.string().trim().minLength(3).maxLength(255),
+    }).optional(),
     vehicleId: vine.number().min(1).optional(),
-    driverId: vine.number().min(1).optional(),
+
   })
 )

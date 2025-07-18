@@ -152,20 +152,45 @@ router
         router.get('/:uuid', [tripController, 'showTrip']).as('trip.show')
         // create a trip
         router.post('/', [tripController, 'createTrip']).as('trip.create')
-        // create a trip with optimization
-        router
-          .post('/optimization', [tripController, 'createTripWithOptimization'])
-          .as('trip.create.optimization')
-        // optimize an existing trip
-        router.post('/:id/optimize', [tripController, 'optimizeTrip']).as('trip.optimize')
-        // get optimized route for a trip
-        router
-          .get('/:uuid/optimized-route', [tripController, 'getOptimizedRoute'])
-          .as('trip.optimized.route')
+        // update a trip
+        router.put('/:uuid', [tripController, 'updateTrip']).as('trip.update')
+
         // test geocoding
         router.post('/test-geocoding', [tripController, 'testGeocoding']).as('trip.test.geocoding')
         // test reverse geocoding
-        router.post('/test-reverse-geocoding', [tripController, 'testReverseGeocoding']).as('trip.test.reverse.geocoding')
+        router
+          .post('/test-reverse-geocoding', [tripController, 'testReverseGeocoding'])
+          .as('trip.test.reverse.geocoding')
+        // test matrix
+        router.post('/test-matrix', [tripController, 'testMatrix']).as('trip.test.matrix')
+        // test symmetric matrix
+        router
+          .post('/test-symmetric-matrix', [tripController, 'testSymmetricMatrix'])
+          .as('trip.test.symmetric.matrix')
+        // test one to many matrix
+        router
+          .post('/test-one-to-many-matrix', [tripController, 'testOneToManyMatrix'])
+          .as('trip.test.one.to.many.matrix')
+        // test many to one matrix
+        router
+          .post('/test-many-to-one-matrix', [tripController, 'testManyToOneMatrix'])
+          .as('trip.test.many.to.one.matrix')
+        // test traffic matrix
+        router
+          .post('/test-traffic-matrix', [tripController, 'testTrafficMatrix'])
+          .as('trip.test.traffic.matrix')
+        // test curbside matrix
+        router
+          .post('/test-curbside-matrix', [tripController, 'testCurbsideMatrix'])
+          .as('trip.test.curbside.matrix')
+        // test fallback matrix
+        router
+          .post('/test-fallback-matrix', [tripController, 'testFallbackMatrix'])
+          .as('trip.test.fallback.matrix')
+        // test nearest destination
+        router
+          .post('/test-nearest-destination', [tripController, 'testNearestDestination'])
+          .as('trip.test.nearest.destination')
       })
       .prefix('/trips')
       .use([middleware.auth()])

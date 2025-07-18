@@ -8,6 +8,10 @@ import Booking from '#models/booking'
 import Review from '#models/review'
 
 export type TripStatus = 'DRAFT' | 'PUBLISHED' | 'FULL' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+export type Coordinates = {
+  latitude: number
+  longitude: number
+}
 
 export default class Trip extends BaseModel {
   @column({ isPrimary: true })
@@ -23,7 +27,7 @@ export default class Trip extends BaseModel {
   declare vehicleId: number
 
   @column()
-  declare departureCoordinates: string // latitude, longitude
+  declare departureCoordinates: Coordinates
 
   @column()
   declare departureCity: string
@@ -32,7 +36,7 @@ export default class Trip extends BaseModel {
   declare arrivalCity: string
 
   @column()
-  declare arrivalCoordinates: string
+  declare arrivalCoordinates: Coordinates
 
   @column.dateTime()
   declare departureDate: DateTime
@@ -67,11 +71,11 @@ export default class Trip extends BaseModel {
   @column()
   declare luggageAllowed: boolean
 
-  @column({
-    prepare: (value: string[]) => JSON.stringify(value),
-    consume: (value: string) => JSON.parse(value),
-  })
-  declare possibleStops: string[] | null
+  @column()
+  declare possibleStops: {
+    stop_1: string
+    stop_2: string
+  } | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

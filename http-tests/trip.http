@@ -13,23 +13,135 @@ Authorization: Bearer {{token}}
 GET {{baseUrl}}/trips/1
 Authorization: Bearer {{token}}
 
-### 3. Create a trip
+### 2b. Get all vehicles (pour trouver un vehicleId valide)
+GET {{baseUrl}}/vehicles
+Authorization: Bearer {{token}}
+
+### 2c. Create a vehicle (si aucun véhicule n'existe)
+POST {{baseUrl}}/vehicles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "brand": "Toyota",
+  "model": "Corolla",
+  "year": 2020,
+  "color": "Blanc",
+  "numberOfSeats": 4,
+  "fuelType": "Essence",
+  "licensePlate": "TG-001-AB",
+  "features": ["Climatisation", "GPS"]
+}
+
+### 3. Create a trip (complet)
 POST {{baseUrl}}/trips
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "departureCoordinates": {
-    "latitude": 48.8566,
-    "longitude": 2.3522
+    "latitude": 6.172674,
+    "longitude": 1.349101
   },
+  "departureCity": "Lomé Centre",
   "arrivalCoordinates": {
-    "latitude": 50.6333,
-    "longitude": 3.0667
+    "latitude": 6.182674,
+    "longitude": 1.359101
+  },
+  "arrivalCity": "Tokoin",
+  "departureDate": "2025-01-20",
+  "departureTime": "08:00",
+  "estimatedDuration": 45,
+  "distanceKm": 12.5,
+  "pricePerSeat": 1500,
+  "availableSeats": 3,
+  "totalSeats": 4,
+  "status": "PUBLISHED",
+  "comments": "Trajet confortable, climatisation disponible",
+  "petsAllowed": false,
+  "luggageAllowed": true,
+  "possibleStops": {
+    "stop_1": "Marché central",
+    "stop_2": "Université de Lomé"
+  },
+    "vehicleId": 3
+}
+
+### 3b. Create a trip (minimal)
+POST {{baseUrl}}/trips
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "departureCoordinates": {
+    "latitude": 6.172674,
+    "longitude": 1.349101
+  },
+  "departureCity": "Lomé",
+  "arrivalCoordinates": {
+    "latitude": 6.192674,
+    "longitude": 1.369101
+  },
+  "arrivalCity": "Kpalimé",
+  "departureDate": "2025-01-21",
+  "departureTime": "14:30",
+  "estimatedDuration": 120,
+  "distanceKm": 85,
+  "pricePerSeat": 5000,
+  "availableSeats": 2,
+  "totalSeats": 3,
+  "petsAllowed": true,
+  "luggageAllowed": true,
+  "vehicleId": 1
+}
+
+### 3c. Create a trip (business)
+POST {{baseUrl}}/trips
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "departureCoordinates": {
+    "latitude": 6.172674,
+    "longitude": 1.349101
+  },
+  "departureCity": "Lomé Port",
+  "arrivalCoordinates": {
+    "latitude": 6.202674,
+    "longitude": 1.379101
+  },
+  "arrivalCity": "Aéroport International",
+  "departureDate": "2025-01-22",
+  "departureTime": "06:00",
+  "estimatedDuration": 30,
+  "distanceKm": 8.2,
+  "pricePerSeat": 3000,
+  "availableSeats": 1,
+  "totalSeats": 2,
+  "status": "PUBLISHED",
+  "comments": "Trajet express vers l'aéroport",
+  "petsAllowed": false,
+  "luggageAllowed": true,
+  "possibleStops": ["Hôtel Sarakawa"],
+  "vehicleId": 1
+}
+
+### 4. Update a trip
+PUT {{baseUrl}}/trips/ce89a959-9a69-496b-8ddc-0dd52894b497
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pricePerSeat": 2000,
+  "comments": "Prix mis à jour - Trajet premium",
+  "availableSeats": 2,
+  "possibleStops": {
+    "stop_1": "Nouveau Marché",
+    "stop_2": "Centre Commercial"
   }
 }
 
-### 4. Create a trip with optimization
+### 5. Create a trip with optimization
 POST {{baseUrl}}/trips/optimization
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -69,3 +181,187 @@ Content-Type: application/json
   "latitude": 6.172674,
     "longitude": 1.349101
 }
+
+### 7. Test matrix (basique)
+POST {{baseUrl}}/trips/test-matrix
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coordinates": [
+    {
+      "latitude": 6.172674,
+      "longitude": 1.349101
+    },
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    }
+  ]
+}
+
+### 8. Test symmetric matrix (matrice symétrique)
+POST {{baseUrl}}/trips/test-symmetric-matrix
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coordinates": [
+    {
+      "latitude": 6.172674,
+      "longitude": 1.349101
+    },
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    },
+    {
+      "latitude": 6.192674,
+      "longitude": 1.369101
+    }
+  ]
+}
+
+### 9. Test one-to-many matrix (un point vers plusieurs)
+POST {{baseUrl}}/trips/test-one-to-many-matrix
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "source": {
+    "latitude": 6.172674,
+    "longitude": 1.349101
+  },
+  "destinations": [
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    },
+    {
+      "latitude": 6.192674,
+      "longitude": 1.369101
+    },
+    {
+      "latitude": 6.202674,
+      "longitude": 1.379101
+    }
+  ]
+}
+
+### 10. Test many-to-one matrix (plusieurs points vers un)
+POST {{baseUrl}}/trips/test-many-to-one-matrix
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "sources": [
+    {
+      "latitude": 6.172674,
+      "longitude": 1.349101
+    },
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    },
+    {
+      "latitude": 6.192674,
+      "longitude": 1.369101
+    }
+  ],
+  "destination": {
+    "latitude": 6.202674,
+    "longitude": 1.379101
+  }
+}
+
+### 11. Test traffic matrix (avec trafic)
+POST {{baseUrl}}/trips/test-traffic-matrix
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coordinates": [
+    {
+      "latitude": 6.172674,
+      "longitude": 1.349101
+    },
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    }
+  ],
+  "departureTime": "2025-01-17T08:00:00Z"
+}
+
+### 12. Test curbside matrix (côté rue)
+POST {{baseUrl}}/trips/test-curbside-matrix
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coordinates": [
+    {
+      "latitude": 6.172674,
+      "longitude": 1.349101
+    },
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    }
+  ],
+  "approaches": ["curb", "unrestricted"]
+}
+
+### 13. Test fallback matrix (avec fallback)
+POST {{baseUrl}}/trips/test-fallback-matrix
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coordinates": [
+    {
+      "latitude": 6.172674,
+      "longitude": 1.349101
+    },
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    },
+    {
+      "latitude": 6.192674,
+      "longitude": 1.369101
+    }
+  ],
+  "fallbackSpeed": 25
+}
+
+### 14. Test nearest destination (destination la plus proche)
+POST {{baseUrl}}/trips/test-nearest-destination
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "origin": {
+    "latitude": 6.172674,
+    "longitude": 1.349101
+  },
+  "destinations": [
+    {
+      "latitude": 6.182674,
+      "longitude": 1.359101
+    },
+    {
+      "latitude": 6.192674,
+      "longitude": 1.369101
+    },
+    {
+      "latitude": 6.202674,
+      "longitude": 1.379101
+    },
+    {
+      "latitude": 6.212674,
+      "longitude": 1.389101
+    }
+  ]
+}
+

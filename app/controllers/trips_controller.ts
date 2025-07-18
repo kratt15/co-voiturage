@@ -1,20 +1,23 @@
 import type { HttpContext } from "@adonisjs/core/http";
 import Trip from "#models/trip";
-import { createTripValidator } from "#validators/trip";
+import { createTripValidator, updateTripValidator } from "#validators/trip";
 import { DateTime } from "luxon";
 // import { RouteService } from "#services/route_service";
-import { MapboxRouteDirectionsService } from "#services/mapbox_route_directions_service";
-import { MapboxRouteOptimizationService } from "#services/mapbox_route_optimization_service";
+// import { MapboxRouteDirectionsService } from "#services/mapbox_route_directions_service";
+// import { MapboxRouteOptimizationService } from "#services/mapbox_route_optimization_service";
+import { MapboxRouteMatrixService } from "#services/mapbox_route_matrix_service";
 import { inject } from "@adonisjs/core/container";
 import { MapboxRouteGeocodingService } from "#services/mapbox_route_geocoding_service";
-
+import type { Coordinates } from "#models/trip";
+import { TripStatus } from "#models/trip";
 @inject()
 export default class TripsController {
   constructor(
     // private routeService: RouteService,
-    private mapboxRouteDirectionsService: MapboxRouteDirectionsService,
-    private optimizationService: MapboxRouteOptimizationService,
+    // private mapboxRouteDirectionsService: MapboxRouteDirectionsService,
+    // private optimizationService: MapboxRouteOptimizationService,
     private geocodingService: MapboxRouteGeocodingService,
+    private matrixService: MapboxRouteMatrixService,
   ) {}
 
   async getAllTrips({ response }: HttpContext) {
@@ -86,79 +89,7 @@ export default class TripsController {
     }
   }
 
-  async createTrip({ request, response }: HttpContext) {
-    try {
-      // const tripData = await request.validateUsing(createTripValidator)
-      const body = request.body();
-      const departureCoordinates = body.departureCoordinates;
-      const arrivalCoordinates = body.arrivalCoordinates;
-
-      console.log("departureCoordinates:", departureCoordinates);
-      console.log("arrivalCoordinates:", arrivalCoordinates);
-
-      // Vérifier que les coordonnées sont présentes
-      if (!departureCoordinates || !arrivalCoordinates) {
-        return response.status(400).json({
-          message: "Les coordonnées de départ et d'arrivée sont requises",
-          debug: {
-            body: body,
-            departureCoordinates: departureCoordinates,
-            arrivalCoordinates: arrivalCoordinates,
-          },
-        });
-      }
-
-      // Vérifier que les coordonnées ont la bonne structure
-      if (
-        !departureCoordinates.latitude ||
-        !departureCoordinates.longitude ||
-        !arrivalCoordinates.latitude ||
-        !arrivalCoordinates.longitude
-      ) {
-        return response.status(400).json({
-          message: "Les coordonnées doivent contenir latitude et longitude",
-        });
-      }
-
-      // const route = await this.routeService.getDirections(
-      //   departureCoordinates,
-      //   arrivalCoordinates,
-      // );
-      // Simple route
-      const route = await this.mapboxRouteDirectionsService.getSimpleRoute(
-        departureCoordinates,
-        arrivalCoordinates,
-      );
-      // Alternatives routes
-      // const route = await this.mapboxRouteDirectionsService.getRouteAlternatives(
-      //   departureCoordinates,
-      //   arrivalCoordinates,
-      // );
-
-      // await Trip.create({
-      //   ...tripData,
-      //   driverId: tripData.driverId,
-      //   vehicleId: tripData.vehicleId,
-      //   status: "DRAFT",
-      //   departureDate: DateTime.fromJSDate(tripData.departureDate),
-      //   departureTime: tripData.departureTime,
-      //   estimatedDuration: tripData.estimatedDuration,
-      //   distanceKm: tripData.distanceKm,
-      //   pricePerSeat: tripData.pricePerSeat,
-      //   availableSeats: tripData.availableSeats,
-      //   totalSeats: tripData.totalSeats,
-      //   departureCoordinates: `${tripData.departureCoordinates.latitude},${tripData.departureCoordinates.longitude}`,
-      //   arrivalCoordinates: `${tripData.arrivalCoordinates.latitude},${tripData.arrivalCoordinates.longitude}`,
-      // })
-      return response
-        .status(201)
-        .json({ message: "Trip created successfully", route });
-    } catch (error) {
-      return response.status(400).json({ message: error });
-    }
-  }
-
-  async createTripWithOptimization({ request, response, auth }: HttpContext) {
+  async createTrip({ request, response, auth }: HttpContext) {
     try {
       const user = auth.getUserOrFail();
       const tripData = await request.validateUsing(createTripValidator);
@@ -168,7 +99,7 @@ export default class TripsController {
         ...tripData,
         driverId: user.id,
         vehicleId: tripData.vehicleId,
-        status: tripData.status || "PUBLISHED",
+        status: "PUBLISHED" as TripStatus,
         departureDate: DateTime.fromJSDate(tripData.departureDate),
         departureTime: tripData.departureTime,
         estimatedDuration: tripData.estimatedDuration,
@@ -176,33 +107,32 @@ export default class TripsController {
         pricePerSeat: tripData.pricePerSeat,
         availableSeats: tripData.availableSeats,
         totalSeats: tripData.totalSeats,
-        departureCoordinates: `${tripData.departureCoordinates.latitude},${tripData.departureCoordinates.longitude}`,
-        arrivalCoordinates: `${tripData.arrivalCoordinates.latitude},${tripData.arrivalCoordinates.longitude}`,
+        departureCoordinates: tripData.departureCoordinates as Coordinates,
+        arrivalCoordinates: tripData.arrivalCoordinates as Coordinates,
+        possibleStops: tripData.possibleStops as {
+          stop_1: string;
+          stop_2: string;
+        },
       });
 
       // Charger les relations
-      await trip.load("driver");
-      await trip.load("vehicle");
-
-      // Si des réservations existent déjà (peu probable pour un nouveau trajet), optimiser
-      await trip.load("bookings");
-
-      let optimizationResult = null;
-      if (trip.bookings && trip.bookings.length > 0) {
-        try {
-          optimizationResult =
-            await this.optimizationService.optimizeTripWithBookings(trip.id);
-          console.log("Trajet optimisé avec succès");
-        } catch (error) {
-          console.error("Erreur lors de l'optimisation:", error);
-          // Ne pas bloquer la création du trajet si l'optimisation échoue
-        }
-      }
+      await trip?.load("driver", (query) => {
+        query.select("uuid");
+      });
+      await trip?.load("vehicle", (query) => {
+        query.select(
+          "uuid",
+          "brand",
+          "model",
+          "color",
+          "numberOfSeats",
+          "fuelType",
+        );
+      });
 
       return response.created({
         message: "Trajet créé avec succès",
         trip,
-        optimization: optimizationResult,
       });
     } catch (error) {
       console.error("Erreur dans createTripWithOptimization:", error);
@@ -212,96 +142,99 @@ export default class TripsController {
       });
     }
   }
-
-  /**
-   * Optimiser un trajet existant
-   */
-  async optimizeTrip({ params, response, auth }: HttpContext) {
+  async updateTrip({ request, response, auth, params }: HttpContext) {
     try {
       const user = auth.getUserOrFail();
-      const tripId = params.id;
+      const { uuid } = params;
+      const tripData = await request.validateUsing(updateTripValidator);
 
       // Vérifier que le trajet existe et appartient au conducteur
       const trip = await Trip.query()
-        .where("id", tripId)
+        .where("uuid", uuid)
         .where("driverId", user.id)
         .firstOrFail();
 
-      // Optimiser le trajet
-      const optimizationResult =
-        await this.optimizationService.optimizeTripWithBookings(trip.id);
-
-      return response.ok({
-        message: "Trajet optimisé avec succès",
-        optimization: optimizationResult,
-      });
-    } catch (error) {
-      console.error("Erreur lors de l'optimisation:", error);
-      return response.badRequest({
-        message: "Erreur lors de l'optimisation du trajet",
-        error: error.message,
-      });
-    }
-  }
-
-  /**
-   * Obtenir la route optimisée d'un trajet
-   */
-  async getOptimizedRoute({ params, response, auth }: HttpContext) {
-    try {
-      const user = auth.getUserOrFail();
-      const tripUuid = params.uuid;
-
-      // Récupérer le trajet
-      const trip = await Trip.query()
-        .where("uuid", tripUuid)
-        .where((query) => {
-          query
-            .where("driverId", user.id)
-            .orWhereHas("bookings", (bookingQuery) => {
-              bookingQuery.where("passengerId", user.id);
-            });
-        })
-        .preload("bookings", (query) => {
-          query.whereIn("status", ["CONFIRMED", "PAID"]);
-        })
-        .firstOrFail();
-
-      // Retourner la route optimisée si elle existe
-      const optimizedRoute = trip.$extras.optimized_route || null;
-      const lastOptimizedAt = trip.$extras.last_optimized_at || null;
-
-      if (!optimizedRoute) {
-        return response.ok({
-          message: "Aucune route optimisée disponible",
-          trip: {
-            uuid: trip.uuid,
-            departureCity: trip.departureCity,
-            arrivalCity: trip.arrivalCity,
-          },
-          optimizedRoute: null,
-          lastOptimizedAt: null,
-        });
+      // Mettre à jour uniquement les champs fournis
+      if (tripData.departureCoordinates) {
+        trip.departureCoordinates =
+          tripData.departureCoordinates as Coordinates;
+      }
+      if (tripData.arrivalCoordinates) {
+        trip.arrivalCoordinates = tripData.arrivalCoordinates as Coordinates;
+      }
+      if (tripData.departureDate) {
+        trip.departureDate = DateTime.fromJSDate(tripData.departureDate);
+      }
+      if (tripData.departureTime) {
+        trip.departureTime = tripData.departureTime;
+      }
+      if (tripData.departureCity) {
+        trip.departureCity = tripData.departureCity;
+      }
+      if (tripData.arrivalCity) {
+        trip.arrivalCity = tripData.arrivalCity;
+      }
+      if (tripData.estimatedDuration) {
+        trip.estimatedDuration = tripData.estimatedDuration;
+      }
+      if (tripData.distanceKm) {
+        trip.distanceKm = tripData.distanceKm;
+      }
+      if (tripData.pricePerSeat) {
+        trip.pricePerSeat = tripData.pricePerSeat;
+      }
+      if (tripData.availableSeats) {
+        trip.availableSeats = tripData.availableSeats;
+      }
+      if (tripData.totalSeats) {
+        trip.totalSeats = tripData.totalSeats;
+      }
+      if (tripData.comments !== undefined) {
+        trip.comments = tripData.comments;
+      }
+      if (tripData.petsAllowed !== undefined) {
+        trip.petsAllowed = tripData.petsAllowed;
+      }
+      if (tripData.luggageAllowed !== undefined) {
+        trip.luggageAllowed = tripData.luggageAllowed;
+      }
+      if (tripData.possibleStops) {
+        trip.possibleStops = tripData.possibleStops;
+      }
+      if (tripData.vehicleId) {
+        trip.vehicleId = tripData.vehicleId;
       }
 
+      await trip.save();
+
+      // Charger les relations
+      await trip.load("driver", (query) => {
+        query.select("uuid");
+      });
+      await trip.load("vehicle", (query) => {
+        query.select(
+          "uuid",
+          "brand",
+          "model",
+          "color",
+          "numberOfSeats",
+          "fuelType",
+        );
+      });
+
       return response.ok({
-        message: "Route optimisée récupérée avec succès",
-        trip: {
-          uuid: trip.uuid,
-          departureCity: trip.departureCity,
-          arrivalCity: trip.arrivalCity,
-        },
-        optimizedRoute,
-        lastOptimizedAt,
-        bookingsCount: trip.bookings.length,
+        message: "Trajet mis à jour avec succès",
+        trip,
       });
     } catch (error) {
+      console.error("Erreur dans updateTrip:", error);
       return response.badRequest({
-        message: "Erreur lors de la récupération de la route optimisée",
+        message: "Erreur lors de la mise à jour du trajet",
         error: error.message,
       });
     }
   }
+
   // tester les geocoding
   async testGeocoding({ request, response }: HttpContext) {
     try {
@@ -343,6 +276,118 @@ export default class TripsController {
       console.error("Erreur dans testReverseGeocoding:", error);
       return response.badRequest({
         message: "Erreur lors du reverse geocoding",
+        error: error.message,
+      });
+    }
+  }
+  // Tester les matrix
+  async testMatrix({ request, response }: HttpContext) {
+    try {
+      const { coordinates } = request.body();
+      const matrix = await this.matrixService.getMatrix(coordinates);
+      return response.ok({ matrix });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test des matrix",
+        error: error.message,
+      });
+    }
+  }
+  // Tester les matrix symétrique
+  async testSymmetricMatrix({ request, response }: HttpContext) {
+    try {
+      const { coordinates } = request.body();
+      const matrix = await this.matrixService.getSymmetricMatrix(coordinates);
+      return response.ok({ matrix });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test des matrix symétriques",
+        error: error.message,
+      });
+    }
+  }
+  // Tester les matrix one to many
+  async testOneToManyMatrix({ request, response }: HttpContext) {
+    try {
+      const { source, destinations } = request.body();
+      const matrix = await this.matrixService.getOneToManyMatrix(
+        source,
+        destinations,
+      );
+      return response.ok({ matrix });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test des matrix one to many",
+        error: error.message,
+      });
+    }
+  }
+  // Tester les matrix many to one
+  async testManyToOneMatrix({ request, response }: HttpContext) {
+    try {
+      const { sources, destination } = request.body();
+      const matrix = await this.matrixService.getManyToOneMatrix(
+        sources,
+        destination,
+      );
+      return response.ok({ matrix });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test des matrix many to one",
+        error: error.message,
+      });
+    }
+  }
+  // Tester les matrix traffic
+  async testTrafficMatrix({ request, response }: HttpContext) {
+    try {
+      const { coordinates } = request.body();
+      const matrix = await this.matrixService.getTrafficMatrix(coordinates);
+      return response.ok({ matrix });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test des matrix traffic",
+        error: error.message,
+      });
+    }
+  }
+  // Tester les matrix curbside
+  async testCurbsideMatrix({ request, response }: HttpContext) {
+    try {
+      const { coordinates } = request.body();
+      const matrix = await this.matrixService.getCurbsideMatrix(coordinates);
+      return response.ok({ matrix });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test des matrix curbside",
+        error: error.message,
+      });
+    }
+  }
+  // Tester les matrix fallback
+  async testFallbackMatrix({ request, response }: HttpContext) {
+    try {
+      const { coordinates } = request.body();
+      const matrix =
+        await this.matrixService.getMatrixWithFallback(coordinates);
+      return response.ok({ matrix });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test des matrix fallback",
+        error: error.message,
+      });
+    }
+  }
+  // Tester le point le plus proche
+  async testNearestDestination({ request, response }: HttpContext) {
+    try {
+      const { origin, destinations } = request.body();
+      const nearestDestination =
+        await this.matrixService.findNearestDestination(origin, destinations);
+      return response.ok({ nearestDestination });
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors du test du point le plus proche",
         error: error.message,
       });
     }
