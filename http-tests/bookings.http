@@ -42,11 +42,11 @@ GET {{host}}/bookings/trips/YOUR_TRIP_UUID/bookings
 Authorization: Bearer {{token}}
 
 ### 7. Confirmer une réservation (conducteur)
-PUT {{host}}/bookings/YOUR_BOOKING_UUID/confirm
+PUT {{host}}/bookings/ad99c685-38da-4079-8df2-46ea07a9e4ad/confirm
 Authorization: Bearer {{token}}
 
 ### 8. Rejeter une réservation (conducteur)
-PUT {{host}}/bookings/YOUR_BOOKING_UUID/reject
+PUT {{host}}/bookings/ad99c685-38da-4079-8df2-46ea07a9e4ad/reject
 Authorization: Bearer {{token}}
 
 ### --- Test d'optimisation ---

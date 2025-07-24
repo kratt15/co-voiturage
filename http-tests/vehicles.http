@@ -9,10 +9,10 @@ Authorization: Bearer {{token}}
 
 {
   "brand": "Toyota",
-  "model": "Corolla",
-  "color": "Red",
-  "licensePlate": "ABC123",
-  "year": 2020,
+  "model": "Camry",
+  "color": "Black",
+  "licensePlate": "BO-123-AB",
+  "year": 2022,
   "numberOfSeats": 5,
   "fuelType": "Gasoline",
   "hasAirConditioning": true,
@@ -48,5 +48,10 @@ Authorization: Bearer {{token}}
 
 ### 5. Suppression d'un véhicule
 DELETE {{baseUrl}}/vehicles/9b9ed03c-17b3-4391-9c35-b334affcffd5
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 6. Récupération de tous les véhicules par l'id du conducteur
+GET {{baseUrl}}/vehicles/driver/3
 Content-Type: application/json
 Authorization: Bearer {{token}}

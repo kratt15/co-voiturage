@@ -139,6 +139,10 @@ router
         router.put('/:uuid', [vehicleController, 'updateVehicle']).as('vehicle.update')
         // delete a vehicle
         router.delete('/:uuid', [vehicleController, 'deleteVehicle']).as('vehicle.delete')
+        // get a vehicle by driver id
+        router
+          .get('/driver/:driverId', [vehicleController, 'getVehicleByDriverId'])
+          .as('vehicle.driver')
       })
       .prefix('/vehicles')
       .use([middleware.auth()])

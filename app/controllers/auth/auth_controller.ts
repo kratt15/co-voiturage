@@ -48,19 +48,19 @@ export default class AuthController {
           { client: trx }
         )
 
-        const mailResponse = await this.mailService.sendMail(
-          user,
-          'Verify your email',
-          'emails/email-verification',
-          'emailVerification'
-        )
+        // const mailResponse = await this.mailService.sendMail(
+        //   user,
+        //   'Verify your email',
+        //   'emails/email-verification',
+        //   'emailVerification'
+        // )
 
-        return { user, mailResponse }
+        return { user }
       })
 
       return response.status(201).json({
         message: 'User created successfully',
-        mailResponse: result.mailResponse,
+        // mailResponse: result.mailResponse,
         user: result.user,
       })
     } catch (error) {
@@ -78,9 +78,9 @@ export default class AuthController {
 
       const user = await User.verifyCredentials(email, password)
 
-      if (user.emailVerified === false) {
-        throw new PrimaryException('email not verified', { code: 'UNVERIFIED_EMAIL', status: 400 })
-      }
+      // if (user.emailVerified === false) {
+      //   throw new PrimaryException('email not verified', { code: 'UNVERIFIED_EMAIL', status: 400 })
+      // }
 
       if (user.isActive === false) {
         throw new PrimaryException('user is not active', { code: 'USER_NOT_ACTIVE', status: 400 })
@@ -205,7 +205,7 @@ export default class AuthController {
       })
     } catch (error) {
       return response.status(400).json({
-        message: 'Password reset failed',
+        message: "Password reset failed",
         error,
       })
     }

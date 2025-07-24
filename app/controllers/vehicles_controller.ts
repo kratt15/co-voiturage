@@ -126,4 +126,16 @@ export default class VehiclesController {
         .json({ message: "Internal server error", error: error });
     }
   }
+
+  async getVehicleByDriverId({ response, request }: HttpContext) {
+    try {
+      const { driverId } = request.params();
+      const vehicle = await Vehicle.query().where("driverId", driverId);
+      return response.json(vehicle);
+    } catch (error) {
+      return response
+        .status(500)
+        .json({ message: "Internal server error", error: error.message });
+    }
+  }
 }

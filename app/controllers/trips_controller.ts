@@ -265,8 +265,8 @@ export default class TripsController {
       console.log("Coordonnées reçues:", { latitude, longitude });
 
       const address = await this.geocodingService.getAddress({
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
+        latitude: latitude,
+        longitude: longitude,
       });
 
       console.log("Adresse récupérée:", address);
